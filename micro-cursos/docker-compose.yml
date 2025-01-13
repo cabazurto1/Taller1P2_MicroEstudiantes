@@ -1,0 +1,27 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-micro-cursos
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: microcursos
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: micro-cursos-app
+    ports:
+      - "8002:8002"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/microcursos
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
